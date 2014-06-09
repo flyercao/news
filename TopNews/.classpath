@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
+	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
+	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.DEPENDENCIES"/>
+	<classpathentry kind="lib" path="D:/Documents/GitHub/afinal/bin/afinal_0.5_bin.jar" sourcepath="D:/Documents/GitHub/afinal/src_version_list/afinal_0.5_src.zip"/>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="gen"/>
+	<classpathentry kind="lib" path="D:/Documents/GitHub/news/TopNews/libs/json-lib-2.4-jdk15.jar"/>
+	<classpathentry kind="output" path="bin/classes"/>
+</classpath>
