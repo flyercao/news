@@ -20,7 +20,7 @@ public class AppApplication extends Application {
 	private static AppApplication mAppApplication;
 	private SQLHelper sqlHelper;
 	private FinalDb db ;
-	private  final static String MAIN_URL="http://10.0.2.2:80";
+	private  final static String MAIN_URL="http://172.20.132.123";
 	public static String getURL(){
 		return MAIN_URL;
 	}
