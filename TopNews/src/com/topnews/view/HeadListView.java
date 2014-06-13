@@ -1,8 +1,19 @@
 package com.topnews.view;
 
+import java.util.List;
+
+import net.tsz.afinal.FinalHttp;
+import net.tsz.afinal.http.AjaxCallBack;
+
+import com.topnews.adapter.NewsAdapter;
+import com.topnews.app.AppApplication;
+import com.topnews.base.Page;
+import com.topnews.bean.NewsEntity;
+
 import android.content.Context;
 import android.graphics.Canvas;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.widget.ListAdapter;
 import android.widget.ListView;
@@ -10,6 +21,8 @@ import android.widget.ListView;
  * 重写的ListView,让每条新闻的时间显示
  */
 public class HeadListView extends ListView {
+	
+	public static String TAG="HeadListView";
 
 	public interface HeaderAdapter {
 		public static final int HEADER_GONE = 0;
@@ -17,13 +30,13 @@ public class HeadListView extends ListView {
 		public static final int HEADER_PUSHED_UP = 2;
 
 		int getHeaderState(int position);
-
+		public List<NewsEntity> getNewsList();
 		void configureHeader(View header, int position, int alpha);
 	}
 
 	private static final int MAX_ALPHA = 255;
 
-	private HeaderAdapter mAdapter;
+	public NewsAdapter mAdapter;
 	private View mHeaderView;
 	private boolean mHeaderViewVisible;
 	private int mHeaderViewWidth;
@@ -70,7 +83,7 @@ public class HeadListView extends ListView {
 
 	public void setAdapter(ListAdapter adapter) {
 		super.setAdapter(adapter);
-		mAdapter = (HeaderAdapter) adapter;
+		mAdapter = (NewsAdapter) adapter;
 	}
 
 	public void configureHeaderView(int position) {
@@ -111,11 +124,48 @@ public class HeadListView extends ListView {
 				mHeaderView.layout(0, y, mHeaderViewWidth, mHeaderViewHeight + y);
 			}
 			mHeaderViewVisible = true;
+			
+			
 			break;
 		}
 		}
 	}
 
+
+	public void loadRecentNews(){
+
+		FinalHttp fh = new FinalHttp();
+		fh.get(AppApplication.getURL()+"/news/getRecentNews", new AjaxCallBack<String>(){
+
+		    @Override
+		    public void onLoading(long count, long current) { //每1秒钟自动被回调一次
+		            Log.e("GETUSER", "loading "+current+"/"+count);
+		    }
+
+		    @Override
+					public void onSuccess(String t) {
+						Log.e(TAG, t);
+						Page news  = new Page().transferToObj(t);
+						mAdapter.getNewsList().addAll(0,news.getList());
+						mAdapter.notifyDataSetChanged();
+						Log.e(TAG, "pageSize=====" + news.getPageSize());
+					}
+		    @Override
+		    public void onStart() {
+		    }
+
+		    @Override
+			public void onFailure(Throwable t,int errorNo ,String strMsg){
+		        //加载失败的时候回调
+		    	Log.e("GETUSER"+strMsg, t.toString());
+		    }
+		    
+		});
+	
+	}
+	
+	
+	
 	protected void dispatchDraw(Canvas canvas) {
 		super.dispatchDraw(canvas);
 		if (mHeaderViewVisible) {

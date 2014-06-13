@@ -16,7 +16,7 @@ public class NewsEntity implements Serializable {
 	/** 新闻类型 */
 	private String newsCategory;
 	/** 标记状态，如推荐之类的 */
-	private Integer mark;;
+	private Integer mark;
 	/** 评论数量 */
 	private Integer commentNum;
 	/** ID */
@@ -48,7 +48,7 @@ public class NewsEntity implements Serializable {
 	/** 图片3 URL */
 	private String picThr;
 	/** 图片 列表 */
-	private List<String> picList=new ArrayList<String>();
+//	private List<String> picList=new ArrayList<String>();
 	/** 图片类型是否为大图 */
 	private Boolean isLarge;
 	/** 阅读状态 ，读过的话显示灰色背景 */
@@ -175,13 +175,13 @@ public class NewsEntity implements Serializable {
 		this.picThr = picThr;
 	}
 
-	public List<String> getPicList() {
-		return picList;
-	}
+//	public List<String> getPicList() {
+//		return picList;
+//	}
 
-	public void setPicList(List<String> picList) {
-		this.picList = picList;
-	}
+//	public void setPicList(List<String> picList) {
+//		this.picList = picList;
+//	}
 
 	public Boolean getReadStatus() {
 		return readStatus;

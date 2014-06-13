@@ -106,7 +106,7 @@ public class NewsFragment extends Fragment {
 	private void initData() {
 //		newsList = Constants.getNewsList(1);
 		newsList = ChannelDao.getNewsByChannel(channel_id);
-		new NewsDao().getAllUser();
+//		newsList.addAll(new NewsDao().getAllUser());
 	}
 	
 	Handler handler = new Handler() {
@@ -151,6 +151,7 @@ public class NewsFragment extends Fragment {
 					initNotify();
 				}
 				break;
+				
 			default:
 				break;
 			}

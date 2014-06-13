@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import net.tsz.afinal.FinalHttp;
+import net.tsz.afinal.http.AjaxCallBack;
+
 import android.app.Activity;
 import android.graphics.drawable.ColorDrawable;
 import android.text.TextUtils;
@@ -26,7 +29,10 @@ import android.widget.TextView;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.topnews.R;
+import com.topnews.app.AppApplication;
+import com.topnews.base.Page;
 import com.topnews.bean.NewsEntity;
+import com.topnews.dao.NewsDao;
 import com.topnews.tool.Constants;
 import com.topnews.tool.DateTools;
 import com.topnews.tool.Options;
@@ -34,6 +40,7 @@ import com.topnews.view.HeadListView;
 import com.topnews.view.HeadListView.HeaderAdapter;
 
 public class NewsAdapter extends BaseAdapter implements SectionIndexer, HeaderAdapter, OnScrollListener{
+	public static String TAG ="NewsAdapter";
 	List<NewsEntity> newsList;
 	Activity activity;
 	LayoutInflater inflater = null;
@@ -52,6 +59,10 @@ public class NewsAdapter extends BaseAdapter implements SectionIndexer, HeaderAd
 	
 	private List<Integer> mPositions;
 	private List<String> mSections;
+	
+	public List<NewsEntity> getNewsList(){
+		return this.newsList;
+	}
 	
 	private void initDateHead() {
 		mSections = new ArrayList<String>();
@@ -375,6 +386,7 @@ public class NewsAdapter extends BaseAdapter implements SectionIndexer, HeaderAd
 			}
 		}
 	}
+	
 	
 	@Override
 	public int getHeaderState(int position) {

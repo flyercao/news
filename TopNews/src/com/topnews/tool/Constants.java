@@ -44,7 +44,7 @@ public class Constants {
 				news.setPicOne(url);
 				url_list.add(url);
 			}
-			news.setPicList(url_list);
+//			news.setPicList(url_list);
 			news.setPublishTime(Long.valueOf(i));
 			news.setReadStatus(false);
 			news.setSource("手机腾讯网");

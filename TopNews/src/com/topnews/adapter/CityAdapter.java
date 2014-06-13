@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.topnews.R;
 import com.topnews.bean.CityEntity;
+import com.topnews.bean.NewsEntity;
 import com.topnews.tool.DateTools;
 import com.topnews.view.HeadListView;
 import com.topnews.view.HeadListView.HeaderAdapter;
@@ -171,5 +172,11 @@ public class CityAdapter extends BaseAdapter implements SectionIndexer,
 	public void onScrollStateChanged(AbsListView view, int scrollState) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public List<NewsEntity> getNewsList() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

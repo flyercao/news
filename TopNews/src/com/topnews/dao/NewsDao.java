@@ -1,10 +1,10 @@
 package com.topnews.dao;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.json.JSONObject;
 import net.tsz.afinal.FinalDb;
 import net.tsz.afinal.FinalHttp;
 import net.tsz.afinal.http.AjaxCallBack;
@@ -21,7 +21,7 @@ import com.topnews.bean.NewsEntity;
 public class NewsDao implements NewsDaoInface{
 	private final String TAG="NewsDao";
 
-	List<NewsEntity> newsList;
+	List<NewsEntity> newsList=new ArrayList<NewsEntity>();
 	
 	@Override
 	public boolean addCache(NewsEntity item) {
@@ -75,21 +75,9 @@ public class NewsDao implements NewsDaoInface{
 		    @Override
 					public void onSuccess(String t) {
 						Log.e(TAG, t);
-						Map map=new HashMap();
-						map.put("list", NewsEntity.class);
-						Page<NewsEntity> news = (Page<NewsEntity>) JSONObject.toBean(JSONObject.fromObject(t), Page.class, map);
-						
-//						news = new Page<NewsEntity>().transferToObj(t);
-//						FinalDb db = AppApplication.getApp().getDb();
-//						for (int i=0;i<news.getArray().size();i++) {
-//							JSONObject obj=news.getArray().get(i);
-//							db.save();
-//						}
+						Page news  = new Page().transferToObj(t);
+						NewsDao.this.newsList=news.getList();
 						Log.e(TAG, "pageSize=====" + news.getPageSize());
-
-						// JSONArray array=JSONArray.fromObject(t);
-						// NewsDao.this.newsList=(List<NewsEntity>)
-						// JSONArray.toCollection(array, NewsEntity.class);
 					}
 		    @Override
 		    public void onStart() {

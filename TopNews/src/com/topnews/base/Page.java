@@ -3,18 +3,16 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-//import org.json.JSONArray;
-//import org.json.JSONException;
-//import org.json.JSONObject;
+import com.alibaba.fastjson.JSON;
+import com.topnews.bean.NewsEntity;
 
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
+
 
 public class Page<T> implements Serializable {
 	
 	private static final long serialVersionUID = -5395997221963176643L;
 	
-	private List<T> list=new ArrayList<T>();	
+	private List<NewsEntity> list=new ArrayList<NewsEntity>();	
 //	private JSONArray array=new JSONArray();			// list result of this page
 //	public JSONArray getArray() {
 //		return array;
@@ -38,7 +36,7 @@ public class Page<T> implements Serializable {
 	 * @param totalPage the total page of paginate
 	 * @param totalRow the total row of paginate
 	 */
-	public Page(List<T> list, int pageNumber, int pageSize, int totalPage, int totalRow) {
+	public Page(List<NewsEntity> list, int pageNumber, int pageSize, int totalPage, int totalRow) {
 		this.list = list;
 		this.pageNumber = pageNumber;
 		this.pageSize = pageSize;
@@ -53,7 +51,7 @@ public class Page<T> implements Serializable {
 	/**
 	 * Return list of this page.
 	 */
-	public List<T> getList() {
+	public List<NewsEntity> getList() {
 		return list;
 	}
 	
@@ -86,13 +84,12 @@ public class Page<T> implements Serializable {
 	}
 	
 	
-	public  Page<T> transferToObj(String json) {
-		Page<T> page=new Page<T>();
-		JSONObject obj=JSONObject.fromObject(json);
-		page.pageNumber=obj.getInt("pageNumber");
-		page.pageSize=obj.getInt("pageSize");
-		page.totalPage=obj.getInt("totalPage");
-		page.totalRow=obj.getInt("totalRow");
+	public  Page transferToObj(String json) {
+		Page page=(Page) JSON.parseObject(json, Page.class);
+//		page.pageNumber=obj.getInt("pageNumber");
+//		page.pageSize=obj.getInt("pageSize");
+//		page.totalPage=obj.getInt("totalPage");
+//		page.totalRow=obj.getInt("totalRow");
 //		array=obj.getJSONArray("list");
 		return page;
 	}
