@@ -19,15 +19,22 @@
         android:layout_centerInParent="true"
         android:src="@drawable/detail_loading" />
 
-    <com.topnews.view.HeadListView
-        android:id="@+id/mListView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:divider="@android:color/transparent"
-        android:dividerHeight="0dp"
-        android:fadingEdge="none"
-        android:scrollbars="none" />
+    <com.topnews.view.RefreshableView
+        android:id="@+id/refreshable_view"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        >
+    
+    		<com.topnews.view.HeadListView
+        		android:id="@+id/mListView"
+        		android:layout_width="match_parent"
+        		android:layout_height="match_parent"
+        		android:divider="@android:color/transparent"
+        		android:dividerHeight="0dp"
+        		android:fadingEdge="none"
+        		android:scrollbars="none" />
 
+    </com.topnews.view.RefreshableView>
     <RelativeLayout
         android:id="@+id/notify_view"
         android:layout_width="fill_parent"

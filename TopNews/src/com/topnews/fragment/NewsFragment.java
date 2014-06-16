@@ -3,6 +3,9 @@ package com.topnews.fragment;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.tsz.afinal.FinalHttp;
+import net.tsz.afinal.http.AjaxCallBack;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -24,11 +27,15 @@ import com.topnews.CityListActivity;
 import com.topnews.DetailsActivity;
 import com.topnews.R;
 import com.topnews.adapter.NewsAdapter;
+import com.topnews.app.AppApplication;
+import com.topnews.base.Page;
 import com.topnews.bean.NewsEntity;
 import com.topnews.dao.ChannelDao;
 import com.topnews.dao.NewsDao;
 import com.topnews.tool.Constants;
 import com.topnews.view.HeadListView;
+import com.topnews.view.RefreshableView;
+import com.topnews.view.RefreshableView.PullToRefreshListener;
 
 public class NewsFragment extends Fragment {
 	private final static String TAG = "NewsFragment";
@@ -43,6 +50,7 @@ public class NewsFragment extends Fragment {
 	//Toast提示框
 	private RelativeLayout notify_view;
 	private TextView notify_view_text;
+	RefreshableView refreshableView;
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
@@ -100,9 +108,60 @@ public class NewsFragment extends Fragment {
 		notify_view = (RelativeLayout)view.findViewById(R.id.notify_view);
 		notify_view_text = (TextView)view.findViewById(R.id.notify_view_text);
 		item_textview.setText(text);
+		
+
+		refreshableView = (RefreshableView) view.findViewById(R.id.refreshable_view);
+		refreshableView.setOnRefreshListener(new PullToRefreshListener() {
+			@Override
+			public void onRefresh() {
+				try {
+					loadRecentNews();
+					Thread.sleep(3000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				refreshableView.finishRefreshing();
+			}
+		}, 0);
 		return view;
 	}
 
+
+	public void loadRecentNews(){
+
+		FinalHttp fh = new FinalHttp();
+		fh.get(AppApplication.getURL()+"/news/getRecentNews", new AjaxCallBack<String>(){
+
+		    @Override
+		    public void onLoading(long count, long current) { //每1秒钟自动被回调一次
+		            Log.e("GETUSER", "loading "+current+"/"+count);
+		    }
+
+		    @Override
+					public void onSuccess(String t) {
+						Log.e(TAG, t);
+						Page news  = new Page().transferToObj(t);
+						mAdapter.getNewsList().addAll(0,news.getList());
+						mAdapter.notifyDataSetChanged();
+						Log.e(TAG, "pageSize=====" + news.getPageSize());
+					}
+		    @Override
+		    public void onStart() {
+		    }
+
+		    @Override
+			public void onFailure(Throwable t,int errorNo ,String strMsg){
+		        //加载失败的时候回调
+		    	Log.e("GETUSER"+strMsg, t.toString());
+		    }
+		    
+		});
+	
+	}
+	
+	
+	
+	
 	private void initData() {
 //		newsList = Constants.getNewsList(1);
 		newsList = ChannelDao.getNewsByChannel(channel_id);

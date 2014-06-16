@@ -17,7 +17,7 @@
         android:paddingRight="16.0dip"
         android:paddingTop="2.0dip" >
 
-        <TextView
+          <TextView
             android:id="@+id/section_text"
             style="@style/item_section_text"
             android:layout_width="0.0dip"
@@ -30,8 +30,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="0.0" />
-    </LinearLayout>
 
+    </LinearLayout>
     <View
         android:id="@+id/section_divider"
         android:layout_width="fill_parent"
