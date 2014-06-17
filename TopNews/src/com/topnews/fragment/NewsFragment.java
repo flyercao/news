@@ -1,7 +1,15 @@
 package com.topnews.fragment;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.util.EntityUtils;
 
 import net.tsz.afinal.FinalHttp;
 import net.tsz.afinal.http.AjaxCallBack;
@@ -12,6 +20,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
+import android.text.InputFilter.LengthFilter;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,6 +31,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.topnews.CityListActivity;
 import com.topnews.DetailsActivity;
@@ -114,53 +124,11 @@ public class NewsFragment extends Fragment {
 		refreshableView.setOnRefreshListener(new PullToRefreshListener() {
 			@Override
 			public void onRefresh() {
-				try {
-					loadRecentNews();
-					Thread.sleep(3000);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-				refreshableView.finishRefreshing();
+				NewsDao.getAllUser(NewsFragment.this.getActivity(),handler,channel_id);
 			}
 		}, 0);
 		return view;
 	}
-
-
-	public void loadRecentNews(){
-
-		FinalHttp fh = new FinalHttp();
-		fh.get(AppApplication.getURL()+"/news/getRecentNews", new AjaxCallBack<String>(){
-
-		    @Override
-		    public void onLoading(long count, long current) { //每1秒钟自动被回调一次
-		            Log.e("GETUSER", "loading "+current+"/"+count);
-		    }
-
-		    @Override
-					public void onSuccess(String t) {
-						Log.e(TAG, t);
-						Page news  = new Page().transferToObj(t);
-						mAdapter.getNewsList().addAll(0,news.getList());
-						mAdapter.notifyDataSetChanged();
-						Log.e(TAG, "pageSize=====" + news.getPageSize());
-					}
-		    @Override
-		    public void onStart() {
-		    }
-
-		    @Override
-			public void onFailure(Throwable t,int errorNo ,String strMsg){
-		        //加载失败的时候回调
-		    	Log.e("GETUSER"+strMsg, t.toString());
-		    }
-		    
-		});
-	
-	}
-	
-	
-	
 	
 	private void initData() {
 //		newsList = Constants.getNewsList(1);
@@ -173,6 +141,17 @@ public class NewsFragment extends Fragment {
 		public void handleMessage(Message msg) {
 			// TODO Auto-generated method stub
 			switch (msg.what) {
+
+			case AppApplication.LOAD_DATA_SUCCESS:
+				Log.e(TAG, "-----------load success---");
+				Page news=(Page) msg.obj;
+				mAdapter.getNewsList().addAll(0,news.getList());
+				mAdapter.notifyDataSetChanged();
+				refreshableView.finishRefreshing();
+				break;
+			case AppApplication.LOAD_DATA_FAILD:
+				refreshableView.finishRefreshing();
+				break;
 			case SET_NEWSLIST:
 				detail_loading.setVisibility(View.GONE);
 				if(mAdapter == null){
@@ -210,6 +189,8 @@ public class NewsFragment extends Fragment {
 					initNotify();
 				}
 				break;
+				
+				
 				
 			default:
 				break;

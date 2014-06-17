@@ -51,7 +51,7 @@ public class ChannelDao implements ChannelDaoInface {
 	}
 	
 	public static List<NewsEntity> getNewsByChannel(int channelId){
-		return AppApplication.getApp().getDb().findAll(NewsEntity.class, "id");
+		return AppApplication.getApp().getDb().findAllByWhere(NewsEntity.class, "newsCategoryId="+channelId,"id desc ");
 		
 	}
 

@@ -1,7 +1,7 @@
 package com.topnews.dao;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -9,17 +9,27 @@ import net.tsz.afinal.FinalDb;
 import net.tsz.afinal.FinalHttp;
 import net.tsz.afinal.http.AjaxCallBack;
 
-import org.json.JSONException;
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.protocol.HTTP;
+import org.apache.http.util.EntityUtils;
 
 import android.content.ContentValues;
+import android.content.Context;
+import android.os.Handler;
 import android.util.Log;
 
 import com.topnews.app.AppApplication;
+import com.topnews.base.BaseHttpClient;
 import com.topnews.base.Page;
 import com.topnews.bean.NewsEntity;
 
 public class NewsDao implements NewsDaoInface{
-	private final String TAG="NewsDao";
+	public static final String TAG="NewsDao";
 
 	List<NewsEntity> newsList=new ArrayList<NewsEntity>();
 	
@@ -63,7 +73,40 @@ public class NewsDao implements NewsDaoInface{
 	}
 	
 	
-	public List<NewsEntity> getAllUser(){
+	public static void getAllUser(final Context context,final Handler handler,int newsCategoryId){
+		HttpPost postMethod = new HttpPost(AppApplication.getURL()+"/news/getRecentNews");  
+
+        try {  
+        	List<NameValuePair> params = new ArrayList<NameValuePair>();  
+			params.add(new BasicNameValuePair("newsItem.newsCategoryId", newsCategoryId+"")); 
+			params.add(new BasicNameValuePair("newsItem.publishTime", new Date().getTime()+""));  
+		                //  设置HTTP POST请求参数  
+			postMethod.setEntity(new UrlEncodedFormEntity(params, HTTP.UTF_8));  
+        	HttpClient httpClient = BaseHttpClient.getHttpClient();  
+
+        	HttpResponse response = httpClient.execute(postMethod); //发起GET请求  
+        	int statusCode=response.getStatusLine().getStatusCode();
+        	Log.e(TAG, "resCode = " + statusCode); //获取响应码  
+        	if(statusCode==200){
+            	String content=EntityUtils.toString(response.getEntity(),"utf-8");
+            	final Page news  = new Page().transferToObj(content);
+            	new Thread(){
+            		public void run(){
+            			FinalDb db=new AppApplication().getDb();
+            			for(int i=0;i<news.getList().size();i++){
+            				db.save(news.getList().get(i));
+            			}
+            		}
+            	}.start();
+            	handler.obtainMessage(AppApplication.LOAD_DATA_SUCCESS,news).sendToTarget();
+            	return ;
+        	}
+        } catch (Exception e) {   
+        }  
+    	handler.obtainMessage(AppApplication.LOAD_DATA_FAILD).sendToTarget();
+	}
+	
+	public  static void getAllUser(){
 		FinalHttp fh = new FinalHttp();
 		fh.get(AppApplication.getURL()+"/news/getRecentNews", new AjaxCallBack<String>(){
 
@@ -75,9 +118,7 @@ public class NewsDao implements NewsDaoInface{
 		    @Override
 					public void onSuccess(String t) {
 						Log.e(TAG, t);
-						Page news  = new Page().transferToObj(t);
-						NewsDao.this.newsList=news.getList();
-						Log.e(TAG, "pageSize=====" + news.getPageSize());
+						Page news  = new Page().transferToObj(t);					    
 					}
 		    @Override
 		    public void onStart() {
@@ -86,22 +127,9 @@ public class NewsDao implements NewsDaoInface{
 		    @Override
 			public void onFailure(Throwable t,int errorNo ,String strMsg){
 		        //加载失败的时候回调
-		    	Log.e("GETUSER"+strMsg, t.toString());
+		    	Log.e("GETUSER"+strMsg, t.toString());	    
 		    }
 		    
 		});
-		return this.newsList;
 	}
-
-//	public static void main(String args[]){
-//		String t="{'pageSize':10,'pageNumber':1,'list':[{'summary':'','newsAbstract':null,'publishTime':'2014-06-11 11:04:18','picListString':null,'source_url':'f1176.html','isLarge':1,'picThr':null,'newsCategoryId':'1','mark':0,'picOne':'http:0','id':'bgdfngfm24jmh','commentNum':5,'title':'IPO温室中重启 A股难成大器','source':'腾讯','local':null,'comment':'实际上，IPO重启意味着A股市场一个正常的恢复融资功能的举措，对于资本市场而言长远来看是利好，但为何需要精心\u201C呵护\u201D？','picTwo':null}],'totalRow':1,'totalPage':1}";
-//		Map classMap = new HashMap();
-//        classMap.put("list", NewsEntity.class);
-//		Page<NewsEntity> diyBean = (Page<NewsEntity>)JSONObject.toBean(JSONObject.fromObject(t),Page.class , classMap);
-//		for(NewsEntity news : diyBean.getList()){
-//			System.out.println("GETUSER-----"+ news.getTitle());
-//		}
-//	}
-//	
-//	
 }
