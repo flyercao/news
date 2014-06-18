@@ -57,6 +57,8 @@ public class NewsFragment extends Fragment {
 	int channel_id;
 	ImageView detail_loading;
 	public final static int SET_NEWSLIST = 0;
+
+	static final private int GET_CODE = 0;
 	//Toast提示框
 	private RelativeLayout notify_view;
 	private TextView notify_view_text;
@@ -143,11 +145,11 @@ public class NewsFragment extends Fragment {
 			switch (msg.what) {
 
 			case AppApplication.LOAD_DATA_SUCCESS:
-				Log.e(TAG, "-----------load success---");
 				Page news=(Page) msg.obj;
 				mAdapter.getNewsList().addAll(0,news.getList());
 				mAdapter.notifyDataSetChanged();
 				refreshableView.finishRefreshing();
+				Log.e(TAG, "-----------load success---"+news.getList().size()+"条数据。");
 				break;
 			case AppApplication.LOAD_DATA_FAILD:
 				refreshableView.finishRefreshing();
@@ -209,11 +211,28 @@ public class NewsFragment extends Fragment {
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
 				Intent intent = new Intent(activity, CityListActivity.class);
-				startActivity(intent);
+				startActivityForResult(intent,GET_CODE);
 			}
 		});
 		mListView.addHeaderView(headview);
 	}
+	
+	/**
+	  * requestCode 请求代码
+	  * resultCode 结果代码
+	  * date 活动间交互附加的数据信息
+	  */
+	 @Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		 if(requestCode == GET_CODE){
+//			 View headview = LayoutInflater.from(activity).inflate(R.layout.city_category_list_tip, null);
+//			 TextView chose_city_tip = (TextView) headview.findViewById(R.id.chose_city_tip);
+			Toast.makeText(this.getActivity(), data.getAction(),Toast.LENGTH_SHORT).show();
+	  }
+	  super.onActivityResult(requestCode, resultCode, data);
+	 }
+
+	
 	
 	/* 初始化通知栏目*/
 	private void initNotify() {

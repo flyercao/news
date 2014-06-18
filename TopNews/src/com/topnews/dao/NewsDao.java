@@ -78,8 +78,10 @@ public class NewsDao implements NewsDaoInface{
 
         try {  
         	List<NameValuePair> params = new ArrayList<NameValuePair>();  
+        	FinalDb db=AppApplication.getApp().getDb();
+        	Long publishTime=db.findDbModelBySQL("select publishTime from news where newsCategoryId = "+newsCategoryId+"  order by publishTime desc limit 1,1").getLong("publishTime");
 			params.add(new BasicNameValuePair("newsItem.newsCategoryId", newsCategoryId+"")); 
-			params.add(new BasicNameValuePair("newsItem.publishTime", new Date().getTime()+""));  
+			params.add(new BasicNameValuePair("newsItem.publishTime", publishTime+""));  
 		                //  设置HTTP POST请求参数  
 			postMethod.setEntity(new UrlEncodedFormEntity(params, HTTP.UTF_8));  
         	HttpClient httpClient = BaseHttpClient.getHttpClient();  
@@ -101,7 +103,8 @@ public class NewsDao implements NewsDaoInface{
             	handler.obtainMessage(AppApplication.LOAD_DATA_SUCCESS,news).sendToTarget();
             	return ;
         	}
-        } catch (Exception e) {   
+        } catch (Exception e) { 
+        	e.printStackTrace();
         }  
     	handler.obtainMessage(AppApplication.LOAD_DATA_FAILD).sendToTarget();
 	}

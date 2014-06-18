@@ -134,104 +134,199 @@ public class NewsAdapter extends BaseAdapter implements SectionIndexer, HeaderAd
 			mHolder.section_text = (TextView)view.findViewById(R.id.section_text);
 			mHolder.section_day = (TextView)view.findViewById(R.id.section_day);
 			
+
+			//获取position对应的数据
+			NewsEntity news = getItem(position);
+			mHolder.item_title.setText(news.getTitle());
+			mHolder.item_source.setText(news.getSource());
+			mHolder.comment_count.setText("评论" + news.getCommentNum());
+			mHolder.publish_time.setText(news.getPublishTime() + "小时前");
+			List<String> imgUrlList = new ArrayList<String>();
+			if(news.getPicOne()!=null&&news.getPicOne().length()>0){
+				imgUrlList.add(news.getPicOne());
+				}
+			if(news.getPicTwo()!=null&&news.getPicTwo().length()>0){
+				imgUrlList.add(news.getPicTwo());
+				}
+			if(news.getPicThr()!=null&&news.getPicThr().length()>0){
+				imgUrlList.add(news.getPicThr());
+				}
+			mHolder.popicon.setVisibility(View.VISIBLE);
+			mHolder.comment_count.setVisibility(View.VISIBLE);
+			mHolder.right_padding_view.setVisibility(View.VISIBLE);
+			if(imgUrlList !=null && imgUrlList.size() !=0){
+				if(imgUrlList.size() == 1){
+					mHolder.item_image_layout.setVisibility(View.GONE);
+					//是否是大图
+					if(news.getIsLarge()){
+						mHolder.large_image.setVisibility(View.VISIBLE);
+						mHolder.right_image.setVisibility(View.GONE);
+						imageLoader.displayImage(imgUrlList.get(0), mHolder.large_image, options);
+						mHolder.popicon.setVisibility(View.GONE);
+						mHolder.comment_count.setVisibility(View.GONE);
+						mHolder.right_padding_view.setVisibility(View.GONE);
+					}else{
+						mHolder.large_image.setVisibility(View.GONE);
+						mHolder.right_image.setVisibility(View.VISIBLE);
+						imageLoader.displayImage(imgUrlList.get(0), mHolder.right_image, options);
+					}
+				}else{
+					mHolder.large_image.setVisibility(View.GONE);
+					mHolder.right_image.setVisibility(View.GONE);
+					mHolder.item_image_layout.setVisibility(View.VISIBLE);
+					imageLoader.displayImage(imgUrlList.get(0), mHolder.item_image_0, options);
+					imageLoader.displayImage(imgUrlList.get(1), mHolder.item_image_1, options);
+					imageLoader.displayImage(imgUrlList.get(2), mHolder.item_image_2, options);
+				}
+			}else{
+				mHolder.right_image.setVisibility(View.GONE);
+				mHolder.item_image_layout.setVisibility(View.GONE);
+			}
+			int markResID = getAltMarkResID(news.getMark(),news.getCollectStatus());
+			if(markResID != -1){
+				mHolder.alt_mark.setVisibility(View.VISIBLE);
+				mHolder.alt_mark.setImageResource(markResID);
+			}else{
+				mHolder.alt_mark.setVisibility(View.GONE);
+			}
+			//判断该新闻概述是否为空
+			if (!TextUtils.isEmpty(news.getNewsAbstract())) {
+				mHolder.item_abstract.setVisibility(View.VISIBLE);
+				mHolder.item_abstract.setText(news.getNewsAbstract());
+			} else {
+				mHolder.item_abstract.setVisibility(View.GONE);
+			}
+			//判断该新闻是否是特殊标记的，推广等，为空就是新闻
+			if(!TextUtils.isEmpty(news.getLocal())){
+				mHolder.list_item_local.setVisibility(View.VISIBLE);
+				mHolder.list_item_local.setText(news.getLocal());
+			}else{
+				mHolder.list_item_local.setVisibility(View.GONE);
+			}
+			//判断评论字段是否为空，不为空显示对应布局
+			if(!TextUtils.isEmpty(news.getComment())){
+				//news.getLocal() != null && 
+				mHolder.comment_layout.setVisibility(View.VISIBLE);
+				mHolder.comment_content.setText(news.getComment());
+			}else{
+				mHolder.comment_layout.setVisibility(View.GONE);
+			}
+			//判断该新闻是否已读
+			if(!news.getReadStatus()){
+				mHolder.item_layout.setSelected(true);
+			}else{
+				mHolder.item_layout.setSelected(false);
+			}
+			//设置+按钮点击效果
+			mHolder.popicon.setOnClickListener(new popAction(position));
+			//头部的相关东西
+			int section = getSectionForPosition(position);
+			if (getPositionForSection(section) == position) {
+				mHolder.layout_list_section.setVisibility(View.VISIBLE);
+//				head_title.setText(news.getDate());
+				mHolder.section_text.setText(mSections.get(section));
+				mHolder.section_day.setText("今天");
+			} else {
+				mHolder.layout_list_section.setVisibility(View.GONE);
+			}
 			view.setTag(mHolder);
 		} else {
 			mHolder = (ViewHolder) view.getTag();
 		}
-		//获取position对应的数据
-		NewsEntity news = getItem(position);
-		mHolder.item_title.setText(news.getTitle());
-		mHolder.item_source.setText(news.getSource());
-		mHolder.comment_count.setText("评论" + news.getCommentNum());
-		mHolder.publish_time.setText(news.getPublishTime() + "小时前");
-		List<String> imgUrlList = new ArrayList<String>();
-		if(news.getPicOne()!=null&&news.getPicOne().length()>0){
-			imgUrlList.add(news.getPicOne());
-			}
-		if(news.getPicTwo()!=null&&news.getPicTwo().length()>0){
-			imgUrlList.add(news.getPicTwo());
-			}
-		if(news.getPicThr()!=null&&news.getPicThr().length()>0){
-			imgUrlList.add(news.getPicThr());
-			}
-		mHolder.popicon.setVisibility(View.VISIBLE);
-		mHolder.comment_count.setVisibility(View.VISIBLE);
-		mHolder.right_padding_view.setVisibility(View.VISIBLE);
-		if(imgUrlList !=null && imgUrlList.size() !=0){
-			if(imgUrlList.size() == 1){
-				mHolder.item_image_layout.setVisibility(View.GONE);
-				//是否是大图
-				if(news.getIsLarge()){
-					mHolder.large_image.setVisibility(View.VISIBLE);
-					mHolder.right_image.setVisibility(View.GONE);
-					imageLoader.displayImage(imgUrlList.get(0), mHolder.large_image, options);
-					mHolder.popicon.setVisibility(View.GONE);
-					mHolder.comment_count.setVisibility(View.GONE);
-					mHolder.right_padding_view.setVisibility(View.GONE);
-				}else{
-					mHolder.large_image.setVisibility(View.GONE);
-					mHolder.right_image.setVisibility(View.VISIBLE);
-					imageLoader.displayImage(imgUrlList.get(0), mHolder.right_image, options);
-				}
-			}else{
-				mHolder.large_image.setVisibility(View.GONE);
-				mHolder.right_image.setVisibility(View.GONE);
-				mHolder.item_image_layout.setVisibility(View.VISIBLE);
-				imageLoader.displayImage(imgUrlList.get(0), mHolder.item_image_0, options);
-				imageLoader.displayImage(imgUrlList.get(1), mHolder.item_image_1, options);
-				imageLoader.displayImage(imgUrlList.get(2), mHolder.item_image_2, options);
-			}
-		}else{
-			mHolder.right_image.setVisibility(View.GONE);
-			mHolder.item_image_layout.setVisibility(View.GONE);
-		}
-		int markResID = getAltMarkResID(news.getMark(),news.getCollectStatus());
-		if(markResID != -1){
-			mHolder.alt_mark.setVisibility(View.VISIBLE);
-			mHolder.alt_mark.setImageResource(markResID);
-		}else{
-			mHolder.alt_mark.setVisibility(View.GONE);
-		}
-		//判断该新闻概述是否为空
-		if (!TextUtils.isEmpty(news.getNewsAbstract())) {
-			mHolder.item_abstract.setVisibility(View.VISIBLE);
-			mHolder.item_abstract.setText(news.getNewsAbstract());
-		} else {
-			mHolder.item_abstract.setVisibility(View.GONE);
-		}
-		//判断该新闻是否是特殊标记的，推广等，为空就是新闻
-		if(!TextUtils.isEmpty(news.getLocal())){
-			mHolder.list_item_local.setVisibility(View.VISIBLE);
-			mHolder.list_item_local.setText(news.getLocal());
-		}else{
-			mHolder.list_item_local.setVisibility(View.GONE);
-		}
-		//判断评论字段是否为空，不为空显示对应布局
-		if(!TextUtils.isEmpty(news.getComment())){
-			//news.getLocal() != null && 
-			mHolder.comment_layout.setVisibility(View.VISIBLE);
-			mHolder.comment_content.setText(news.getComment());
-		}else{
-			mHolder.comment_layout.setVisibility(View.GONE);
-		}
-		//判断该新闻是否已读
-		if(!news.getReadStatus()){
-			mHolder.item_layout.setSelected(true);
-		}else{
-			mHolder.item_layout.setSelected(false);
-		}
-		//设置+按钮点击效果
-		mHolder.popicon.setOnClickListener(new popAction(position));
-		//头部的相关东西
-		int section = getSectionForPosition(position);
-		if (getPositionForSection(section) == position) {
-			mHolder.layout_list_section.setVisibility(View.VISIBLE);
-//			head_title.setText(news.getDate());
-			mHolder.section_text.setText(mSections.get(section));
-			mHolder.section_day.setText("今天");
-		} else {
-			mHolder.layout_list_section.setVisibility(View.GONE);
-		}
+//		//获取position对应的数据
+//		NewsEntity news = getItem(position);
+//		mHolder.item_title.setText(news.getTitle());
+//		mHolder.item_source.setText(news.getSource());
+//		mHolder.comment_count.setText("评论" + news.getCommentNum());
+//		mHolder.publish_time.setText(news.getPublishTime() + "小时前");
+//		List<String> imgUrlList = new ArrayList<String>();
+//		if(news.getPicOne()!=null&&news.getPicOne().length()>0){
+//			imgUrlList.add(news.getPicOne());
+//			}
+//		if(news.getPicTwo()!=null&&news.getPicTwo().length()>0){
+//			imgUrlList.add(news.getPicTwo());
+//			}
+//		if(news.getPicThr()!=null&&news.getPicThr().length()>0){
+//			imgUrlList.add(news.getPicThr());
+//			}
+//		mHolder.popicon.setVisibility(View.VISIBLE);
+//		mHolder.comment_count.setVisibility(View.VISIBLE);
+//		mHolder.right_padding_view.setVisibility(View.VISIBLE);
+//		if(imgUrlList !=null && imgUrlList.size() !=0){
+//			if(imgUrlList.size() == 1){
+//				mHolder.item_image_layout.setVisibility(View.GONE);
+//				//是否是大图
+//				if(news.getIsLarge()){
+//					mHolder.large_image.setVisibility(View.VISIBLE);
+//					mHolder.right_image.setVisibility(View.GONE);
+//					imageLoader.displayImage(imgUrlList.get(0), mHolder.large_image, options);
+//					mHolder.popicon.setVisibility(View.GONE);
+//					mHolder.comment_count.setVisibility(View.GONE);
+//					mHolder.right_padding_view.setVisibility(View.GONE);
+//				}else{
+//					mHolder.large_image.setVisibility(View.GONE);
+//					mHolder.right_image.setVisibility(View.VISIBLE);
+//					imageLoader.displayImage(imgUrlList.get(0), mHolder.right_image, options);
+//				}
+//			}else{
+//				mHolder.large_image.setVisibility(View.GONE);
+//				mHolder.right_image.setVisibility(View.GONE);
+//				mHolder.item_image_layout.setVisibility(View.VISIBLE);
+//				imageLoader.displayImage(imgUrlList.get(0), mHolder.item_image_0, options);
+//				imageLoader.displayImage(imgUrlList.get(1), mHolder.item_image_1, options);
+//				imageLoader.displayImage(imgUrlList.get(2), mHolder.item_image_2, options);
+//			}
+//		}else{
+//			mHolder.right_image.setVisibility(View.GONE);
+//			mHolder.item_image_layout.setVisibility(View.GONE);
+//		}
+//		int markResID = getAltMarkResID(news.getMark(),news.getCollectStatus());
+//		if(markResID != -1){
+//			mHolder.alt_mark.setVisibility(View.VISIBLE);
+//			mHolder.alt_mark.setImageResource(markResID);
+//		}else{
+//			mHolder.alt_mark.setVisibility(View.GONE);
+//		}
+//		//判断该新闻概述是否为空
+//		if (!TextUtils.isEmpty(news.getNewsAbstract())) {
+//			mHolder.item_abstract.setVisibility(View.VISIBLE);
+//			mHolder.item_abstract.setText(news.getNewsAbstract());
+//		} else {
+//			mHolder.item_abstract.setVisibility(View.GONE);
+//		}
+//		//判断该新闻是否是特殊标记的，推广等，为空就是新闻
+//		if(!TextUtils.isEmpty(news.getLocal())){
+//			mHolder.list_item_local.setVisibility(View.VISIBLE);
+//			mHolder.list_item_local.setText(news.getLocal());
+//		}else{
+//			mHolder.list_item_local.setVisibility(View.GONE);
+//		}
+//		//判断评论字段是否为空，不为空显示对应布局
+//		if(!TextUtils.isEmpty(news.getComment())){
+//			//news.getLocal() != null && 
+//			mHolder.comment_layout.setVisibility(View.VISIBLE);
+//			mHolder.comment_content.setText(news.getComment());
+//		}else{
+//			mHolder.comment_layout.setVisibility(View.GONE);
+//		}
+//		//判断该新闻是否已读
+//		if(!news.getReadStatus()){
+//			mHolder.item_layout.setSelected(true);
+//		}else{
+//			mHolder.item_layout.setSelected(false);
+//		}
+//		//设置+按钮点击效果
+//		mHolder.popicon.setOnClickListener(new popAction(position));
+//		//头部的相关东西
+//		int section = getSectionForPosition(position);
+//		if (getPositionForSection(section) == position) {
+//			mHolder.layout_list_section.setVisibility(View.VISIBLE);
+////			head_title.setText(news.getDate());
+//			mHolder.section_text.setText(mSections.get(section));
+//			mHolder.section_day.setText("今天");
+//		} else {
+//			mHolder.layout_list_section.setVisibility(View.GONE);
+//		}
 		return view;
 	}
 
@@ -371,20 +466,20 @@ public class NewsAdapter extends BaseAdapter implements SectionIndexer, HeaderAd
 	@Override
 	public void onScroll(AbsListView view, int firstVisibleItem,
 			int visibleItemCount, int totalItemCount) {
-		// TODO Auto-generated method stub
-		if (view instanceof HeadListView) {
-			Log.d("first", "first:" + view.getFirstVisiblePosition());
-			if(isCityChannel){
-				if(view.getFirstVisiblePosition() == 0){
-					isfirst = true;
-				}else{
-					isfirst = false;
-				}
-				((HeadListView) view).configureHeaderView(firstVisibleItem - 1);
-			}else{
-				((HeadListView) view).configureHeaderView(firstVisibleItem);
-			}
-		}
+//		// TODO Auto-generated method stub
+//		if (view instanceof HeadListView) {
+//			Log.d("first", "first:" + view.getFirstVisiblePosition());
+//			if(isCityChannel){
+//				if(view.getFirstVisiblePosition() == 0){
+//					isfirst = true;
+//				}else{
+//					isfirst = false;
+//				}
+//				((HeadListView) view).configureHeaderView(firstVisibleItem - 1);
+//			}else{
+//				((HeadListView) view).configureHeaderView(firstVisibleItem);
+//			}
+//		}
 	}
 	
 	

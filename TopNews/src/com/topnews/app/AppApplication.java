@@ -1,8 +1,14 @@
 package com.topnews.app;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 import net.tsz.afinal.FinalDb;
+import android.app.Application;
+import android.content.Context;
+import android.util.Log;
 
 import com.nostra13.universalimageloader.cache.disc.impl.UnlimitedDiscCache;
 import com.nostra13.universalimageloader.cache.disc.naming.Md5FileNameGenerator;
@@ -12,15 +18,13 @@ import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
 import com.nostra13.universalimageloader.utils.StorageUtils;
 import com.topnews.db.SQLHelper;
 
-import android.app.Application;
-import android.content.Context;
-import android.util.Log;
-
 public class AppApplication extends Application {
 	private static AppApplication mAppApplication;
 	private SQLHelper sqlHelper;
 	private FinalDb db ;
 	private  final static String MAIN_URL="http://192.168.0.191";
+    private final static String DB_PATH = "/data/data/com.topnews/databases/";
+    private final static String DB_NAME = "database.db";
 	public final static int LOAD_DATA_SUCCESS = 1;
 	public final static int LOAD_DATA_FAILD = 2;
 	public static String getURL(){
@@ -28,7 +32,7 @@ public class AppApplication extends Application {
 	}
 	public FinalDb getDb(){
 		if(db==null){
-			db=FinalDb.create(this,"database.db");
+			db=FinalDb.create(this,DB_NAME);
 		}
 		return this.db;
 	}
@@ -40,6 +44,7 @@ public class AppApplication extends Application {
 		super.onCreate();
 		initImageLoader(getApplicationContext());
 		mAppApplication = this;
+		initDb();
 	}
 	
 	/** 获取Application */
@@ -88,5 +93,42 @@ public class AppApplication extends Application {
 				.build();
 		// Initialize ImageLoader with configuration.
 		ImageLoader.getInstance().init(config);//全局初始化此配置
+	}
+	
+	
+	
+	/**
+	 * 安装SQLite数据库
+	 */
+	public void initDb(){
+        // 检查 SQLite 数据库文件是否存在
+        if ((new File(DB_PATH + DB_NAME)).exists() == false) {
+            // 如 SQLite 数据库文件不存在，再检查一下 database 目录是否存在
+            File f = new File(DB_PATH);
+            // 如 database 目录不存在，新建该目录
+            if (!f.exists()) {
+                f.mkdir();
+            }
+            try {
+                // 得到 assets 目录下我们实现准备好的 SQLite 数据库作为输入流
+                InputStream is = getApplicationContext().getAssets().open(DB_NAME);
+                // 输出流
+                OutputStream os = new FileOutputStream(DB_PATH + DB_NAME);
+
+                // 文件写入
+                byte[] buffer = new byte[1024];
+                int length;
+                while ((length = is.read(buffer)) > 0) {
+                    os.write(buffer, 0, length);
+                }
+
+                // 关闭文件流
+                os.flush();
+                os.close();
+                is.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
 	}
 }

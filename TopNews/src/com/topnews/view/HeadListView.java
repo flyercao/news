@@ -15,6 +15,7 @@ import android.graphics.Canvas;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
+import android.widget.BaseAdapter;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 /**
@@ -36,7 +37,7 @@ public class HeadListView extends ListView {
 
 	private static final int MAX_ALPHA = 255;
 
-	public NewsAdapter mAdapter;
+	public HeaderAdapter mAdapter;
 	private View mHeaderView;
 	private boolean mHeaderViewVisible;
 	private int mHeaderViewWidth;
@@ -57,10 +58,10 @@ public class HeadListView extends ListView {
 	protected void onLayout(boolean changed, int left, int top, int right,
 			int bottom) {
 		super.onLayout(changed, left, top, right, bottom);
-		if (mHeaderView != null) {
-			mHeaderView.layout(0, 0, mHeaderViewWidth, mHeaderViewHeight);
-			configureHeaderView(getFirstVisiblePosition());
-		}
+//		if (mHeaderView != null) {
+//			mHeaderView.layout(0, 0, mHeaderViewWidth, mHeaderViewHeight);
+//			configureHeaderView(getFirstVisiblePosition());
+//		}
 	}
 
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
@@ -83,87 +84,54 @@ public class HeadListView extends ListView {
 
 	public void setAdapter(ListAdapter adapter) {
 		super.setAdapter(adapter);
-		mAdapter = (NewsAdapter) adapter;
+		mAdapter = (HeaderAdapter) adapter;
 	}
 
 	public void configureHeaderView(int position) {
-		if (mHeaderView == null) {
-			return;
-		}
-		int state = mAdapter.getHeaderState(position);
-		switch (state) {
-		case HeaderAdapter.HEADER_GONE: {
-			mHeaderViewVisible = false;
-			break;
-		}
-
-		case HeaderAdapter.HEADER_VISIBLE: {
-			mAdapter.configureHeader(mHeaderView, position, MAX_ALPHA);
-			if (mHeaderView.getTop() != 0) {
-				mHeaderView.layout(0, 0, mHeaderViewWidth, mHeaderViewHeight);
-			}
-			mHeaderViewVisible = true;
-			break;
-		}
-
-		case HeaderAdapter.HEADER_PUSHED_UP: {
-			View firstView = getChildAt(0);
-			int bottom = firstView.getBottom();
-			int headerHeight = mHeaderView.getHeight();
-			int y;
-			int alpha;
-			if (bottom < headerHeight) {
-				y = (bottom - headerHeight);
-				alpha = MAX_ALPHA * (headerHeight + y) / headerHeight;
-			} else {
-				y = 0;
-				alpha = MAX_ALPHA;
-			}
-			mAdapter.configureHeader(mHeaderView, position, alpha);
-			if (mHeaderView.getTop() != y) {
-				mHeaderView.layout(0, y, mHeaderViewWidth, mHeaderViewHeight + y);
-			}
-			mHeaderViewVisible = true;
-			
-			
-			break;
-		}
-		}
+//		if (mHeaderView == null) {
+//			return;
+//		}
+//		int state = mAdapter.getHeaderState(position);
+//		switch (state) {
+//		case HeaderAdapter.HEADER_GONE: {
+//			mHeaderViewVisible = false;
+//			break;
+//		}
+//
+//		case HeaderAdapter.HEADER_VISIBLE: {
+//			mAdapter.configureHeader(mHeaderView, position, MAX_ALPHA);
+//			if (mHeaderView.getTop() != 0) {
+//				mHeaderView.layout(0, 0, mHeaderViewWidth, mHeaderViewHeight);
+//			}
+//			mHeaderViewVisible = true;
+//			break;
+//		}
+//
+//		case HeaderAdapter.HEADER_PUSHED_UP: {
+//			View firstView = getChildAt(0);
+//			int bottom = firstView.getBottom();
+//			int headerHeight = mHeaderView.getHeight();
+//			int y;
+//			int alpha;
+//			if (bottom < headerHeight) {
+//				y = (bottom - headerHeight);
+//				alpha = MAX_ALPHA * (headerHeight + y) / headerHeight;
+//			} else {
+//				y = 0;
+//				alpha = MAX_ALPHA;
+//			}
+//			mAdapter.configureHeader(mHeaderView, position, alpha);
+//			if (mHeaderView.getTop() != y) {
+//				mHeaderView.layout(0, y, mHeaderViewWidth, mHeaderViewHeight + y);
+//			}
+//			mHeaderViewVisible = true;
+//			
+//			
+//			break;
+//		}
+//		}
 	}
 
-
-	public void loadRecentNews(){
-
-		FinalHttp fh = new FinalHttp();
-		fh.get(AppApplication.getURL()+"/news/getRecentNews", new AjaxCallBack<String>(){
-
-		    @Override
-		    public void onLoading(long count, long current) { //每1秒钟自动被回调一次
-		            Log.e("GETUSER", "loading "+current+"/"+count);
-		    }
-
-		    @Override
-					public void onSuccess(String t) {
-						Log.e(TAG, t);
-						Page news  = new Page().transferToObj(t);
-						mAdapter.getNewsList().addAll(0,news.getList());
-						mAdapter.notifyDataSetChanged();
-						Log.e(TAG, "pageSize=====" + news.getPageSize());
-					}
-		    @Override
-		    public void onStart() {
-		    }
-
-		    @Override
-			public void onFailure(Throwable t,int errorNo ,String strMsg){
-		        //加载失败的时候回调
-		    	Log.e("GETUSER"+strMsg, t.toString());
-		    }
-		    
-		});
-	
-	}
-	
 	
 	
 	protected void dispatchDraw(Canvas canvas) {

@@ -51,6 +51,8 @@ public class CityListActivity extends BaseActivity {
 //				Intent intent = new Intent(getApplicationContext(), DetailsActivity.class);
 //				startActivity(intent);
 				overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+				setResult(RESULT_OK, (new Intent()).setAction(cityList.get(position).getName()));
+				finish();
 			}
 		});
 	}
